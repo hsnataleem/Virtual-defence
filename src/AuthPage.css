@@ -1,0 +1,157 @@
+.auth-container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+}
+.auth-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0px 0px 30px rgba(255, 0, 255, 0.3);
+  backdrop-filter: blur(1px);
+  border: 1px solid #9333ea;
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #a7a1ad;
+  margin-bottom: 1.5rem;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  background: #111827;
+  border: 1px solid #9333ea;
+  color: white;
+  outline: none;
+  box-shadow: 0 0 8px rgba(147, 51, 234, 0.5);
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 0.75rem;
+  background: #9333ea;
+  color: white;
+  font-weight: bold;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.auth-btn:hover {
+  background: #7e22ce;
+}
+
+.auth-message {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #f472b6;
+}
+
+.auth-toggle {
+  margin-top: 1rem;
+  color: #d1d5db;
+  font-size: 0.9rem;
+}
+
+.auth-link {
+  color: #c084fc;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.forgot-password {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #f472b6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.social-login {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.google-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 0.75rem;
+  background: white;
+  color: black;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.google-btn:hover {
+  background: #e5e7eb;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.email-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to right, #9333ea, #ec4899);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.email-btn:hover {
+  opacity: 0.9;
+}
+/* Optional small helpers */
+.auth-toggle .auth-link { text-decoration: underline; }
+.auth-toggle .auth-link:hover { opacity: 0.9; }
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+/* Popup Card */
+.popup-card {
+  background: rgba(31, 41, 55, 0.9);
+  border: 1px solid #9333ea;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0px 0px 25px rgba(147, 51, 234, 0.6);
+  backdrop-filter: blur(10px);
+}
