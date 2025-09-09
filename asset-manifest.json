@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/Virtual-defence/static/css/main.8149bbf6.css",
-    "main.js": "/Virtual-defence/static/js/main.47a6b989.js",
+    "main.js": "/Virtual-defence/static/js/main.53089d2d.js",
     "static/js/204.b1b8cdc3.chunk.js": "/Virtual-defence/static/js/204.b1b8cdc3.chunk.js",
     "static/js/12.2b9a8b8b.chunk.js": "/Virtual-defence/static/js/12.2b9a8b8b.chunk.js",
     "static/js/953.a03787e9.chunk.js": "/Virtual-defence/static/js/953.a03787e9.chunk.js",
@@ -9,7 +9,7 @@
     "static/media/gold.png": "/Virtual-defence/static/media/gold.13285d01aa9fce73c90e.png",
     "index.html": "/Virtual-defence/index.html",
     "main.8149bbf6.css.map": "/Virtual-defence/static/css/main.8149bbf6.css.map",
-    "main.47a6b989.js.map": "/Virtual-defence/static/js/main.47a6b989.js.map",
+    "main.53089d2d.js.map": "/Virtual-defence/static/js/main.53089d2d.js.map",
     "204.b1b8cdc3.chunk.js.map": "/Virtual-defence/static/js/204.b1b8cdc3.chunk.js.map",
     "12.2b9a8b8b.chunk.js.map": "/Virtual-defence/static/js/12.2b9a8b8b.chunk.js.map",
     "953.a03787e9.chunk.js.map": "/Virtual-defence/static/js/953.a03787e9.chunk.js.map",
@@ -17,6 +17,6 @@
   },
   "entrypoints": [
     "static/css/main.8149bbf6.css",
-    "static/js/main.47a6b989.js"
+    "static/js/main.53089d2d.js"
   ]
 }
