@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ProfilePage from "./pages/ProfilePage";
-import AdminLogin from "./pages/AdminLogin"; // Admin login page
-import AdminPanel from "./pages/AdminPanel"; // Admin Panel / Owner view
+import AdminLogin from "./pages/AdminLogin";
+import AdminPanel from "./pages/AdminPanel";
 import { auth, db } from "./firebase";
 import { doc, getDoc } from "firebase/firestore";
 import GlobalStyles from "./components/GlobalStyles";
@@ -13,7 +13,7 @@ import GlobalStyles from "./components/GlobalStyles";
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false); // global admin state
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [particles, setParticles] = useState([]);
 
@@ -27,7 +27,7 @@ export default function App() {
 
         if (snap.exists()) {
           const data = snap.data();
-          setIsAdmin(data.isAdmin === true); // ensure boolean
+          setIsAdmin(data.isAdmin === true);
         } else {
           setIsAdmin(false);
         }
@@ -83,7 +83,6 @@ export default function App() {
           path="/profile"
           element={user ? <ProfilePage isAdmin={isAdmin} /> : <Navigate to="/auth" replace />}
         />
-
         <Route
           path="/admin-login"
           element={user && !isAdmin ? <AdminLogin /> : <Navigate to="/home" replace />}

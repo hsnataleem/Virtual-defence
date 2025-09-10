@@ -37,7 +37,7 @@ export default function AdminPanel() {
 
   const navigate = useNavigate();
 
-  // --- admin check useEffect ---
+  // --- admin check ---
   useEffect(() => {
     const checkAdmin = async () => {
       const user = auth.currentUser;
@@ -93,7 +93,7 @@ export default function AdminPanel() {
     checkAdmin();
   }, [navigate]);
 
-  // --- realtime data ---
+  // --- realtime admin requests ---
   useEffect(() => {
     if (!isAdmin) return;
     return onSnapshot(collection(db, "adminRequests"), (snap) =>
@@ -101,14 +101,22 @@ export default function AdminPanel() {
     );
   }, [isAdmin]);
 
+  // --- realtime chatHistory ---
   useEffect(() => {
     if (!isAdmin) return;
-    const q = query(collection(db, "chatHistory"), orderBy("timestamp", "desc"));
+    const q = query(collection(db, "chatHistory"), orderBy("timestamp", "asc"));
     return onSnapshot(q, (snap) =>
-      setChatHistory(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+      setChatHistory(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+          timestamp: d.data().timestamp?.toDate() || new Date(),
+        }))
+      )
     );
   }, [isAdmin]);
 
+  // --- realtime complaints ---
   useEffect(() => {
     if (!isAdmin) return;
     const q = query(collection(db, "complaints"), orderBy("createdAt", "desc"));
@@ -123,13 +131,14 @@ export default function AdminPanel() {
     );
   }, [isAdmin]);
 
-  // --- functions ---
+  // --- handle requests ---
   const handleRequestUpdate = async (id, status, uid) => {
     await updateDoc(doc(db, "adminRequests", id), { status });
     if (status === "approved") await updateDoc(doc(db, "users", uid), { isAdmin: true });
     alert(`✅ Request ${status}`);
   };
 
+  // --- notifications ---
   const handleSendNotification = async () => {
     if (!notification.trim()) return;
     setSending(true);
@@ -144,6 +153,7 @@ export default function AdminPanel() {
     alert("✅ Notification sent");
   };
 
+  // --- complaints ---
   const updateComplaintStatus = async (id, status, userEmail) => {
     await updateDoc(doc(db, "complaints", id), { status });
     await addDoc(collection(db, "notifications"), {
@@ -158,6 +168,66 @@ export default function AdminPanel() {
     alert("🗑️ Complaint deleted");
   };
 
+  const downloadComplaintPDF = (complaint) => {
+    const docPDF = new jsPDF();
+    docPDF.setFontSize(18);
+    docPDF.text("VIRTUAL DEFENCE SYSTEM", 20, 20);
+    docPDF.setFontSize(12);
+    docPDF.text(
+      "Greetings from Commander! Here is your resolved complaint report:",
+      20,
+      35
+    );
+    autoTable(docPDF, {
+      startY: 50,
+      head: [["Crime Type", "Description", "User", "Status", "Date"]],
+      body: [
+        [
+          complaint.crimeType || "N/A",
+          complaint.description || "N/A",
+          complaint.user || "Unknown",
+          complaint.status || "N/A",
+          complaint.createdAt?.toLocaleString() || "N/A",
+        ],
+      ],
+      theme: "grid",
+      headStyles: { fillColor: [79, 70, 229] },
+      bodyStyles: { fillColor: [31, 31, 46], textColor: [255, 255, 255] },
+    });
+    docPDF.save(`complaint_${complaint.id}.pdf`);
+  };
+
+  // --- chat functions ---
+  const saveChat = async (userEmail, message) => {
+    try {
+      await addDoc(collection(db, "chatHistory"), {
+        userEmail,
+        message,
+        timestamp: serverTimestamp(),
+      });
+    } catch (err) {
+      console.error("Error saving chat:", err);
+    }
+  };
+
+  const handleSendMessage = async (message) => {
+    const userEmail = auth.currentUser?.email || "Unknown";
+
+    // Save user message
+    await saveChat(userEmail, message);
+
+    // Generate AI response
+    const aiResponse = `AI Response to: "${message}"`;
+    await saveChat("AI Bot", aiResponse);
+
+    // Update local chatHistory
+    setChatHistory((prev) => [
+      ...prev,
+      { userEmail, message, id: Date.now() },
+      { userEmail: "AI Bot", message: aiResponse, id: Date.now() + 1 },
+    ]);
+  };
+
   const exportChatPDF = () => {
     const docPDF = new jsPDF();
     docPDF.text("Chat History", 14, 20);
@@ -167,53 +237,13 @@ export default function AdminPanel() {
       body: chatHistory.map((c) => [
         c.userEmail || "Unknown",
         c.message || "",
-        c.timestamp?.toDate ? c.timestamp.toDate().toLocaleString() : "",
+        c.timestamp?.toLocaleString ? c.timestamp.toLocaleString() : "",
       ]),
     });
     docPDF.save("chat_history.pdf");
   };
 
-  // --- download resolved complaint PDF ---
-  const downloadComplaintPDF = (complaint) => {
-    const docPDF = new jsPDF();
-    const logo = new Image();
-    logo.src = "/gold.png"; // must be in public folder
-    logo.onload = () => {
-      docPDF.addImage(logo, "PNG", 10, 10, 30, 30);
-
-      // Web name & greeting
-      docPDF.setFontSize(18);
-      docPDF.text("VIRTUAL DEFENCE SYSTEM", 50, 20);
-      docPDF.setFontSize(12);
-      docPDF.text(
-        "Greetings from Commander! Here is your resolved complaint report:",
-        10,
-        50
-      );
-
-      // Complaint details
-      autoTable(docPDF, {
-        startY: 60,
-        head: [["Crime Type", "Description", "User", "Status", "Date"]],
-        body: [
-          [
-            complaint.crimeType || "N/A",
-            complaint.description || "N/A",
-            complaint.user || "Unknown",
-            complaint.status || "N/A",
-            complaint.createdAt?.toLocaleString() || "N/A",
-          ],
-        ],
-        theme: "grid",
-        headStyles: { fillColor: [79, 70, 229] },
-        bodyStyles: { fillColor: [31, 31, 46], textColor: [255, 255, 255] },
-      });
-
-      docPDF.save(`complaint_${complaint.id}.pdf`);
-    };
-  };
-
-  // --- premium dark theme ---
+  // --- UI styles ---
   const sidebar = {
     width: "260px",
     height: "100vh",
@@ -364,13 +394,31 @@ export default function AdminPanel() {
                   <div key={c.id} style={card}>
                     <strong>{c.userEmail || "Unknown"}</strong>
                     <p>{c.message}</p>
-                    <small>
-                      {c.timestamp?.toDate
-                        ? c.timestamp.toDate().toLocaleString()
-                        : ""}
-                    </small>
+                    <small>{c.timestamp?.toLocaleString()}</small>
                   </div>
                 ))}
+            </div>
+
+            {/* AI chat input */}
+            <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem" }}>
+              <input
+                type="text"
+                placeholder="Type a message..."
+                id="chatInput"
+                style={{ flex: 1, padding: "0.5rem", borderRadius: "6px", background: "#1f1f2e", color: "#fff" }}
+              />
+              <button
+                style={{ padding: "0.5rem 1rem", background: "#4f46e5", color: "#fff", borderRadius: "6px" }}
+                onClick={() => {
+                  const message = document.getElementById("chatInput").value;
+                  if (message.trim() !== "") {
+                    handleSendMessage(message);
+                    document.getElementById("chatInput").value = "";
+                  }
+                }}
+              >
+                Send
+              </button>
             </div>
           </div>
         )}
