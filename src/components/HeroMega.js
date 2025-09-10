@@ -1,7 +1,7 @@
 // src/components/HeroMega.js
 import React, { useEffect, useRef, useState } from "react";
 import Lottie from "lottie-react";
-import earthAnimation from "./Green Robot.json"; // <-- Add your Lottie JSON here
+import earthAnimation from "./Green Robot.json";
 
 export default function HeroMega({ slogans = null }) {
   const canvasRef = useRef(null);
@@ -108,7 +108,27 @@ export default function HeroMega({ slogans = null }) {
     consoleInput:{ display:"flex", gap:8, marginTop:10 },
     inputBox:{ flex:1, background:"rgba(255,255,255,0.02)", color:"#dfffe8", border:"1px solid rgba(255,255,255,0.03)", padding:"8px 10px", borderRadius:8, fontFamily:"'Courier New', monospace" },
     assistant:{ position:"absolute", top:12, right:12, zIndex:6, background:"rgba(6,8,14,0.95)", padding:"10px 12px", borderRadius:12, boxShadow:"0 10px 40px rgba(3,7,18,0.6)", border:"1px solid rgba(0,255,150,0.06)", color:"#aeeac1", fontSize:13 },
-    assistantDot:{ width:10,height:10,borderRadius:10,background:"linear-gradient(180deg,#00ff80,#00a86b)", boxShadow:"0 0 8px rgba(0,255,150,0.35)" }
+    assistantDot:{ width:10,height:10,borderRadius:10,background:"linear-gradient(180deg,#00ff80,#00a86b)", boxShadow:"0 0 8px rgba(0,255,150,0.35)" },
+
+    // Responsive adjustments
+    "@media(max-width:768px)": {
+      content:{ gridTemplateColumns:"1fr", gap:16 },
+      lottieWrap:{ width:250, height:250 },
+      title:{ fontSize:28 },
+      subtitle:{ fontSize:14 },
+      typewriter:{ fontSize:14 },
+      terminal:{ fontSize:11, height:120 },
+      ctaBtn:{ fontSize:14, padding:"8px 12px" },
+      altBtn:{ fontSize:13, padding:"8px 10px" },
+    },
+    "@media(max-width:480px)": {
+      root:{ padding:"2rem 0.5rem" },
+      title:{ fontSize:22 },
+      subtitle:{ fontSize:12 },
+      lottieWrap:{ width:200, height:200 },
+      terminal:{ fontSize:10, height:100 },
+      typewriter:{ fontSize:12 },
+    }
   };
 
   return (

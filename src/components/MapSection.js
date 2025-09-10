@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -44,12 +44,20 @@ function Recenter({ position }) {
 export default function MapSection() {
   const [position, setPosition] = useState([33.6844, 73.0479]);
   const [search, setSearch] = useState("");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const stations = {
     Islamabad: [33.6844, 73.0479],
     Lahore: [31.5497, 74.3436],
     Karachi: [24.8607, 67.0011],
   };
+
+  // Handle window resize for responsiveness
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleSearch = async () => {
     if (!search) return;
@@ -74,7 +82,7 @@ export default function MapSection() {
     <section
       id="map"
       style={{
-        padding: "4rem 2rem",
+        padding: "2rem 1rem",
         color: "#fff",
       }}
     >
@@ -82,22 +90,22 @@ export default function MapSection() {
         style={{
           fontSize: "2rem",
           marginBottom: "2rem",
-          textAlign: "left", // 👈 heading bhi left align
+          textAlign: "left",
           fontWeight: "bold",
-          marginLeft: "100px",
+          marginLeft: isMobile ? "0" : "100px",
         }}
       >
         📍 Nearest Recovery Station
       </h2>
 
-      {/* Main container with sidebar + map */}
+      {/* Container: sidebar + map */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "320px 1fr",
-          gap: "2rem",
+          gridTemplateColumns: isMobile ? "1fr" : "320px 1fr",
+          gap: "1.5rem",
           maxWidth: "1400px",
-          margin: "0 auto 0 100px", // 👈 offset look (left side gap 100px)
+          margin: isMobile ? "0 auto" : "0 auto 0 100px",
           alignItems: "stretch",
         }}
       >
@@ -114,7 +122,7 @@ export default function MapSection() {
           }}
         >
           <h3 style={{ marginBottom: "10px" }}>🔍 Search Location</h3>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             <input
               type="text"
               value={search}
@@ -127,6 +135,7 @@ export default function MapSection() {
                 border: "1px solid #444",
                 background: "#1e293b",
                 color: "#fff",
+                minWidth: "150px",
               }}
             />
             <button
@@ -173,12 +182,13 @@ export default function MapSection() {
             borderRadius: "20px",
             overflow: "hidden",
             boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+            minHeight: "400px",
           }}
         >
           <MapContainer
             center={position}
             zoom={13}
-            style={{ width: "100%", height: "500px" }}
+            style={{ width: "100%", height: "100%" }}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
