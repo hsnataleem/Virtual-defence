@@ -99,28 +99,23 @@ export default function Records() {
     );
 
    try {
-  const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
-console.log("API Key:", apiKey);
+  const response = await fetch("http://localhost:4000/api/chat", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    message: currentQuery,
+  }),
+});
 
-const url =
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+if (!response.ok) {
+  throw new Error("Backend request failed");
+}
 
+const data = await response.json();
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: currentQuery }] }]
-    }),
-  });
-
-  const data = await response.json();
-  
-  // Extract text safely from the standard Gemini JSON response structure
-  const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-
+const aiText = data.text;
   await addDoc(
     collection(db, "users", userId, "sessions", sessionId, "messages"),
     {
