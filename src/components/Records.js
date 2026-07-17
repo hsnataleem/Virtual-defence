@@ -43,7 +43,7 @@ export default function Records() {
 
     return () => unsubscribe();
   }, [userId, sessionId]);
-
+// eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) return;
     const recognition = new window.webkitSpeechRecognition();
@@ -58,8 +58,7 @@ export default function Records() {
     };
 
     recognitionRef.current = recognition;
-  }, []);
-
+}, []);
   const startListening = () => recognitionRef.current?.start();
 
   const speak = (text) => {
@@ -99,40 +98,51 @@ export default function Records() {
       }
     );
 
-    try {
-      const response = await fetch("https://api.cohere.ai/v1/chat", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer TqLjM4pxlpEMpATTrVO46Bgrp0vxM0BD8fggfPEJ",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ model: "command-r", message: currentQuery }),
-      });
-      const data = await response.json();
-      const aiText = data.text || "No response";
+   try {
+  const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+console.log("API Key:", apiKey);
 
-      await addDoc(
-        collection(db, "users", userId, "sessions", sessionId, "messages"),
-        {
-          type: "ai",
-          text: aiText,
-          timestamp: serverTimestamp(),
-        }
-      );
-    } catch (error) {
-      console.error(error);
-      await addDoc(
-        collection(db, "users", userId, "sessions", sessionId, "messages"),
-        {
-          type: "ai",
-          text: "❌ Failed to get response.",
-          timestamp: serverTimestamp(),
-        }
-      );
-    } finally {
-      setLoading(false);
+const url =
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: currentQuery }] }]
+    }),
+  });
+
+  const data = await response.json();
+  
+  // Extract text safely from the standard Gemini JSON response structure
+  const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+
+  await addDoc(
+    collection(db, "users", userId, "sessions", sessionId, "messages"),
+    {
+      type: "ai",
+      text: aiText,
+      timestamp: serverTimestamp(),
     }
-  };
+  );
+} catch (error) {
+  console.error(error);
+  await addDoc(
+    collection(db, "users", userId, "sessions", sessionId, "messages"),
+    {
+      type: "ai",
+      text: "❌ Failed to get response.",
+      timestamp: serverTimestamp(),
+    }
+  );
+} finally {
+  setLoading(false);
+}
+};
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleSend();
