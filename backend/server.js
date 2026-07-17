@@ -10,33 +10,31 @@ app.use(cors());
 app.use(express.json());
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+    apiKey: process.env.GEMINI_API_KEY,
 });
 
 app.post("/api/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
+    try {
+        const { message } = req.body;
 
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: message,
-    });
+        const result = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: message,
+        });
 
-    res.json({
-      text: result.text,
-    });
-  } catch (err) {
-    console.error(err);
+        res.json({
+            text: result.text,
+        });
 
-    res.status(500).json({
-      error: err.message,
-    });
-  }
+    } catch (err) {
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message,
+        });
+    }
 });
 
-// Use the port provided by Northflank (or 4000 locally)
-const PORT = process.env.PORT || 4000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(4000, () => {
+    console.log("Server running on port 4000");
 });
